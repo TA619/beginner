@@ -192,6 +192,19 @@ cursor: pointer;
     color: #fbbf24;
     font-size: 1.2rem;
 }
+.clear-btn {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+.clear-btn:hover {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+.action-btn-group {
+    display: flex;
+    gap: 12px;
+}
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -199,9 +212,9 @@ cursor: pointer;
 <header class="mb-8">
 <div class="flex items-center justify-between">
 <h1 class="text-3xl font-bold text-gray-900">VMC Vendor Inspection Checklist</h1>
-<div class="flex items-center space-x-4">
-<button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-button flex items-center shadow-sm hover:bg-gray-50 whitespace-nowrap">
-<i class="ri-save-line mr-2"></i> Save Draft
+<div class="action-btn-group">
+<button id="clear-all-top" class="clear-btn px-4 py-2 rounded-button flex items-center shadow-sm whitespace-nowrap">
+<i class="ri-eraser-line mr-2"></i> Clear All
 </button>
 <button class="bg-primary text-white px-4 py-2 rounded-button flex items-center shadow-sm hover:bg-indigo-600 whitespace-nowrap">
 <i class="ri-check-line mr-2"></i> Submit
@@ -397,7 +410,6 @@ cursor: pointer;
 </div>
 </div>
 </div>
-</div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 <div class="bg-white rounded-lg shadow-md overflow-hidden section-card">
 <div class="section-header bg-gradient-to-r from-green-50 to-white p-4 flex items-center justify-between" data-section="waste">
@@ -587,7 +599,6 @@ cursor: pointer;
 </div>
 </div>
 </div>
-</div>
 <div class="bg-white rounded-lg shadow-md p-6 mb-8">
 <h2 class="text-lg font-semibold text-gray-800 mb-4">Additional Comments</h2>
 <textarea class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" rows="4" placeholder="Enter any additional observations or comments..."></textarea>
@@ -749,10 +760,10 @@ cursor: pointer;
 </div>
 </div>
 <div class="flex justify-between mt-8">
-<button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-button flex items-center shadow-sm hover:bg-gray-50 whitespace-nowrap">
-<i class="ri-save-line mr-2"></i> Save Draft
+<button id="clear-all-bottom" class="clear-btn px-4 py-2 rounded-button flex items-center shadow-sm whitespace-nowrap">
+<i class="ri-eraser-line mr-2"></i> Clear All
 </button>
-<div class="flex space-x-4">
+<div class="action-btn-group">
 <button id="print-button" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-button flex items-center shadow-sm hover:bg-gray-50 whitespace-nowrap">
 <i class="ri-printer-line mr-2"></i> Print
 </button>
@@ -943,6 +954,77 @@ document.addEventListener("DOMContentLoaded", function () {
   updateWasteScore();
   updatePricingScore();
   updateTotalScore();
+  
+  // Clear all functionality
+  function resetForm() {
+    // Reset all inputs
+    document.getElementById('vendor-name').value = '';
+    document.getElementById('location').value = '';
+    document.getElementById('inspector').value = '';
+    document.getElementById('date').value = '2025-06-18';
+    document.getElementById('time').value = '';
+    
+    // Reset radio buttons
+    document.querySelector('input[name="visit-type"][value="monthly"]').checked = true;
+    
+    // Reset all score inputs to 0
+    document.querySelectorAll('.score-input').forEach(input => {
+      input.value = 0;
+    });
+    
+    // Reset all checkboxes
+    document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
+      checkbox.classList.remove('checked');
+    });
+    
+    // Reset radio groups
+    document.querySelectorAll('input[name="pricing-visible"][value="yes"]').forEach(radio => {
+      radio.checked = true;
+    });
+    document.querySelectorAll('input[name="pricing-approved"][value="yes"]').forEach(radio => {
+      radio.checked = true;
+    });
+    
+    // Reset student reviews
+    for(let i = 1; i <= 3; i++) {
+      document.getElementById(`student-name-${i}`).value = '';
+      document.getElementById(`student-rating-${i}`).value = '5';
+      document.getElementById(`student-review-${i}`).value = '';
+    }
+    
+    // Reset additional comments
+    document.querySelector('textarea').value = '';
+    
+    // Trigger updates to recalculate scores
+    updateHygieneScore();
+    updateStaffScore();
+    updateWasteScore();
+    updatePricingScore();
+    updateTotalScore();
+    
+    // Show success message
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform transition-all duration-300 opacity-0';
+    toast.innerHTML = '<i class="ri-check-line mr-2"></i> Form has been reset successfully!';
+    document.body.appendChild(toast);
+    
+    // Animate toast in
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    // Animate toast out after 3 seconds
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 3000);
+  }
+  
+  // Attach clear functionality to both buttons
+  document.getElementById('clear-all-top').addEventListener('click', resetForm);
+  document.getElementById('clear-all-bottom').addEventListener('click', resetForm);
 });
 </script>
 </body>
